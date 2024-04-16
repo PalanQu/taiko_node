@@ -1,0 +1,61 @@
+- name: update apt repo and install packages
+  apt:
+    update_cache: yes
+    name:
+      - git
+      - pkg-config
+      - curl
+      - build-essential
+      - libssl-dev
+      - libclang-dev
+      - ufw
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+    install_recommends: no
+
+- name: git clone taiko
+  git:
+    repo: 'https://github.com/taikoxyz/simple-taiko-node.git'
+    dest: '/root/taiko'
+
+- name: render env file
+  template:
+    src: templates/env.j2
+    dest: /root/taiko/.env
+
+- name: Ensure /etc/apt/keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Docker's official GPG key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: 'a+r'
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu jammy stable"
+    filename: docker
+    state: present
+
+- name: update apt repo and install packages
+  apt:
+    update_cache: yes
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - docker-compose-plugin
+    state: present
+    install_recommends: no
+
+- name: Docker compose up
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: /root/taiko
+  become: true

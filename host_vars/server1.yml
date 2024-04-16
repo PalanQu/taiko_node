@@ -1,0 +1,5 @@
+l1_endpoint_http: ''
+l1_endpoint_ws: ''
+enable_proposer: true
+disable_p2p_sync: false
+l1_proposer_private_key: ''

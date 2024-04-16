@@ -1,0 +1,17 @@
+- name: render env file
+  template:
+    src: templates/env.j2
+    dest: /root/taiko/.env
+    force: true
+
+- name: Docker compose down
+  ansible.builtin.command:
+    cmd: docker compose down
+    chdir: /root/taiko
+  become: true
+
+- name: Docker compose up
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: /root/taiko
+  become: true
